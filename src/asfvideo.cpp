@@ -296,7 +296,7 @@ namespace Exiv2 {
 
     using namespace Exiv2::Internal;
 
-    AsfVideo::AsfVideo(BasicIo::AutoPtr io)
+    AsfVideo::AsfVideo(BasicIo::UniquePtr io)
         : Image(ImageType::asf, mdNone, io)
     {
     } // AsfVideo::AsfVideo
@@ -376,7 +376,7 @@ namespace Exiv2 {
         DataBuf buf(1000);
         unsigned long count = 0, tempLength = 0;
         buf.pData_[4] = '\0' ;
-        Exiv2::Value::AutoPtr v = Exiv2::Value::create(Exiv2::xmpSeq);
+        Exiv2::Value::UniquePtr v = Exiv2::Value::create(Exiv2::xmpSeq);
 
         if(compareTag( exvGettext(tv->label_), "Header")) {
             localPosition_ = 0;
@@ -628,7 +628,7 @@ namespace Exiv2 {
         DataBuf buf(5000);
         io_->read(buf.pData_, 2);
         int recordCount = Exiv2::getUShort(buf.pData_, littleEndian), nameLength = 0, dataLength = 0, dataType = 0;
-        Exiv2::Value::AutoPtr v = Exiv2::Value::create(Exiv2::xmpSeq);
+        Exiv2::Value::UniquePtr v = Exiv2::Value::create(Exiv2::xmpSeq);
         byte guidBuf[16];   char fileID[37] = "";
 
         while(recordCount--) {
@@ -790,9 +790,9 @@ namespace Exiv2 {
     } // AsfVideo::aspectRatio
 
 
-    Image::AutoPtr newAsfInstance(BasicIo::AutoPtr io, bool /*create*/)
+    Image::UniquePtr newAsfInstance(BasicIo::UniquePtr io, bool /*create*/)
     {
-        Image::AutoPtr image(new AsfVideo(io));
+        Image::UniquePtr image(new AsfVideo(io));
         if (!image->good()) {
             image.reset();
         }

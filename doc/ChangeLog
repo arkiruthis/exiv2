@@ -1466,7 +1466,7 @@ Changes from version 0.5 to 0.6
 	  IptcData and Iptcdatum. This operator stuff allows for things like:
 	  exifData["Exif.Thumbnail.Compression"] = uint16_t(6);
 
-	* Converted class hierarchies to use std::auto_ptr where appropriate
+	* Converted class hierarchies to use std::unique_ptr where appropriate
 
 	* Replaced custom integer types with C99 types
 

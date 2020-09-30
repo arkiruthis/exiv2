@@ -50,8 +50,8 @@ EXIV2_RCSID("@(#) $Id$")
 // class member definitions
 namespace Exiv2 {
 
-    RafImage::RafImage(BasicIo::AutoPtr io, bool /*create*/)
-        : Image(ImageType::raf, mdExif | mdIptc | mdXmp, io)
+    RafImage::RafImage(BasicIo::UniquePtr io, bool /*create*/)
+        : Image(ImageType::raf, mdExif | mdIptc | mdXmp, std::move(io))
     {
     } // RafImage::RafImage
 
@@ -329,9 +329,9 @@ namespace Exiv2 {
 
     // *************************************************************************
     // free functions
-    Image::AutoPtr newRafInstance(BasicIo::AutoPtr io, bool create)
+    Image::UniquePtr newRafInstance(BasicIo::UniquePtr io, bool create)
     {
-        Image::AutoPtr image(new RafImage(io, create));
+        Image::UniquePtr image(new RafImage(std::move(io), create));
         if (!image->good()) {
             image.reset();
         }

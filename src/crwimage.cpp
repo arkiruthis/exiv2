@@ -82,8 +82,8 @@ namespace Exiv2 {
 
     using namespace Internal;
 
-    CrwImage::CrwImage(BasicIo::AutoPtr io, bool /*create*/)
-        : Image(ImageType::crw, mdExif | mdComment, io)
+    CrwImage::CrwImage(BasicIo::UniquePtr io, bool /*create*/)
+        : Image(ImageType::crw, mdExif | mdComment, std::move(io))
     {
     } // CrwImage::CrwImage
 
@@ -169,7 +169,7 @@ namespace Exiv2 {
         CrwParser::encode(blob, buf.pData_, buf.size_, this);
 
         // Write new buffer to file
-        MemIo::AutoPtr tempIo(new MemIo);
+        MemIo::UniquePtr tempIo(new MemIo);
         assert(tempIo.get() != 0);
         tempIo->write((blob.size() > 0 ? &blob[0] : 0), static_cast<long>(blob.size()));
         io_->close();
@@ -183,7 +183,7 @@ namespace Exiv2 {
         assert(pData != 0);
 
         // Parse the image, starting with a CIFF header component
-        CiffHeader::AutoPtr head(new CiffHeader);
+        CiffHeader::UniquePtr head(new CiffHeader);
         head->read(pData, size);
 #ifdef DEBUG
         head->print(std::cerr);
@@ -206,7 +206,7 @@ namespace Exiv2 {
     )
     {
         // Parse image, starting with a CIFF header component
-        CiffHeader::AutoPtr head(new CiffHeader);
+        CiffHeader::UniquePtr head(new CiffHeader);
         if (size != 0) {
             head->read(pData, size);
         }
@@ -220,9 +220,9 @@ namespace Exiv2 {
 
     // *************************************************************************
     // free functions
-    Image::AutoPtr newCrwInstance(BasicIo::AutoPtr io, bool create)
+    Image::UniquePtr newCrwInstance(BasicIo::UniquePtr io, bool create)
     {
-        Image::AutoPtr image(new CrwImage(io, create));
+        Image::UniquePtr image(new CrwImage(std::move(io), create));
         if (!image->good()) {
             image.reset();
         }
@@ -358,17 +358,17 @@ namespace Exiv2 {
         }
     }
 
-    void CiffComponent::add(AutoPtr component)
+    void CiffComponent::add(UniquePtr component)
     {
-        doAdd(component);
+        doAdd(std::move(component));
     }
 
-    void CiffEntry::doAdd(AutoPtr /*component*/)
+    void CiffEntry::doAdd(UniquePtr /*component*/)
     {
         throw Error(34, "CiffEntry::add");
     } // CiffEntry::doAdd
 
-    void CiffDirectory::doAdd(AutoPtr component)
+    void CiffDirectory::doAdd(UniquePtr component)
     {
         components_.push_back(component.release());
     } // CiffDirectory::doAdd
@@ -469,14 +469,14 @@ namespace Exiv2 {
         for (uint16_t i = 0; i < count; ++i) {
             if (o + 10 > size) throw Error(33);
             uint16_t tag = getUShort(pData + o, byteOrder);
-            CiffComponent::AutoPtr m;
+            CiffComponent::UniquePtr m;
             switch (CiffComponent::typeId(tag)) {
-            case directory: m = CiffComponent::AutoPtr(new CiffDirectory); break;
-            default: m = CiffComponent::AutoPtr(new CiffEntry); break;
+            case directory: m = CiffComponent::UniquePtr(new CiffDirectory); break;
+            default: m = CiffComponent::UniquePtr(new CiffEntry); break;
             }
             m->setDir(this->tag());
             m->read(pData, size, o, byteOrder);
-            add(m);
+            add(std::move(m));
             o += 10;
         }
     }  // CiffDirectory::readDirectory
@@ -690,7 +690,7 @@ namespace Exiv2 {
            << ", " << _("size") << " = " << std::dec << size_
            << ", " << _("offset") << " = " << offset_ << "\n";
 
-        Value::AutoPtr value;
+        Value::UniquePtr value;
         if (typeId() != directory) {
             value = Value::create(typeId());
             value->read(pData_, size_, byteOrder);
@@ -845,9 +845,9 @@ namespace Exiv2 {
             }
             if (cc_ == 0) {
                 // Directory doesn't exist yet, add it
-                m_ = AutoPtr(new CiffDirectory(csd.crwDir_, csd.parent_));
+                m_ = UniquePtr(new CiffDirectory(csd.crwDir_, csd.parent_));
                 cc_ = m_.get();
-                add(m_);
+                add(std::move(m_));
             }
             // Recursive call to next lower level directory
             cc_ = cc_->add(crwDirs, crwTagId);
@@ -862,9 +862,9 @@ namespace Exiv2 {
             }
             if (cc_ == 0) {
                 // Tag doesn't exist yet, add it
-                m_ = AutoPtr(new CiffEntry(crwTagId, tag()));
+                m_ = UniquePtr(new CiffEntry(crwTagId, tag()));
                 cc_ = m_.get();
-                add(m_);
+                add(std::move(m_));
             }
         }
         return cc_;
@@ -979,7 +979,7 @@ namespace Exiv2 {
 
         // Make
         ExifKey key1("Exif.Image.Make");
-        Value::AutoPtr value1 = Value::create(ciffComponent.typeId());
+        Value::UniquePtr value1 = Value::create(ciffComponent.typeId());
         uint32_t i = 0;
         for (;    i < ciffComponent.size()
                && ciffComponent.pData()[i] != '\0'; ++i) {
@@ -990,7 +990,7 @@ namespace Exiv2 {
 
         // Model
         ExifKey key2("Exif.Image.Model");
-        Value::AutoPtr value2 = Value::create(ciffComponent.typeId());
+        Value::UniquePtr value2 = Value::create(ciffComponent.typeId());
         uint32_t j = i;
         for (;    i < ciffComponent.size()
                && ciffComponent.pData()[i] != '\0'; ++i) {
@@ -1125,7 +1125,7 @@ namespace Exiv2 {
         assert(pCrwMapping != 0);
         // create a key and value pair
         ExifKey key(pCrwMapping->tag_, Internal::groupName(pCrwMapping->ifdId_));
-        Value::AutoPtr value;
+        Value::UniquePtr value;
         if (ciffComponent.typeId() != directory) {
             value = Value::create(ciffComponent.typeId());
             uint32_t size = 0;

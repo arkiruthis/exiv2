@@ -37,7 +37,7 @@
 
 struct ImageWrapper
 {
-    Exiv2::Image::AutoPtr image;
+    Exiv2::Image::UniquePtr image;
 };
 
 // Returns NULL (0) handle if failed.
@@ -256,7 +256,7 @@ EXIVSIMPLE_API int ModifyMeta(HIMAGE img, const char *key, const char *val, DllT
 
         if (type == invalidTypeId)
             type = (DllTypeId)Exiv2::IptcDataSets::dataSetType(iptcKey.tag(), iptcKey.record());
-        Exiv2::Value::AutoPtr value = Exiv2::Value::create((Exiv2::TypeId)type);
+        Exiv2::Value::UniquePtr value = Exiv2::Value::create((Exiv2::TypeId)type);
         value->read(data);
 
         Exiv2::IptcData::iterator iter = iptcData.findKey(iptcKey);
@@ -280,7 +280,7 @@ EXIVSIMPLE_API int ModifyMeta(HIMAGE img, const char *key, const char *val, DllT
             // No way to get value type for exif... string is the most common
             if (type == invalidTypeId)
                 type = asciiString;
-            Exiv2::Value::AutoPtr value = Exiv2::Value::create((Exiv2::TypeId)type);
+            Exiv2::Value::UniquePtr value = Exiv2::Value::create((Exiv2::TypeId)type);
             value->read(data);
 
             Exiv2::ExifData::iterator iter = exifData.findKey(exifKey);
@@ -329,7 +329,7 @@ EXIVSIMPLE_API int AddMeta(HIMAGE img, const char *key, const char *val, DllType
 
         if (type == invalidTypeId)
             type = (DllTypeId)Exiv2::IptcDataSets::dataSetType(iptcKey.tag(), iptcKey.record());
-        Exiv2::Value::AutoPtr value = Exiv2::Value::create((Exiv2::TypeId)type);
+        Exiv2::Value::UniquePtr value = Exiv2::Value::create((Exiv2::TypeId)type);
         value->read(data);
 
         rc = iptcData.add(iptcKey, value.get());
@@ -346,7 +346,7 @@ EXIVSIMPLE_API int AddMeta(HIMAGE img, const char *key, const char *val, DllType
             // No way to get value type for exif... string is the most common
             if (type == invalidTypeId)
                 type = asciiString;
-            Exiv2::Value::AutoPtr value = Exiv2::Value::create((Exiv2::TypeId)type);
+            Exiv2::Value::UniquePtr value = Exiv2::Value::create((Exiv2::TypeId)type);
             value->read(data);
 
             exifData.add(exifKey, value.get());

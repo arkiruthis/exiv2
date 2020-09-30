@@ -251,7 +251,7 @@ std::string build_dest(const fs::path &source_file)
 {
     std::string dest;
 
-    Exiv2::Image::AutoPtr image;
+    Exiv2::Image::UniquePtr image;
     try {
         image = Exiv2::ImageFactory::open(source_file.string());
         image->readMetadata();

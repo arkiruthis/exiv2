@@ -566,7 +566,7 @@ bool readImage(const char* path,Options& /* options */)
     bool bResult = false ;
 
     try {
-        Image::AutoPtr image = ImageFactory::open(path);
+        Image::UniquePtr image = ImageFactory::open(path);
         if ( image.get() ) {
             image->readMetadata();
             ExifData &exifData = image->exifData();
@@ -594,7 +594,7 @@ time_t readImageTime(std::string path,std::string* pS=NULL)
 
     while ( !result && ds++  ) {
         try {
-            Image::AutoPtr image = ImageFactory::open(path);
+            Image::UniquePtr image = ImageFactory::open(path);
             if ( image.get() ) {
                 image->readMetadata();
                 ExifData &exifData = image->exifData();
@@ -854,7 +854,7 @@ int main(int argc,const char* argv[])
             try {
                 time_t t       = readImageTime(arg,&stamp) ;
                 Position* pPos = searchTimeDict(gTimeDict,t,Position::deltaMax_);
-                Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(gFiles[p]);
+                Exiv2::Image::UniquePtr image = Exiv2::ImageFactory::open(gFiles[p]);
                 if ( image.get() ) {
                     image->readMetadata();
                     Exiv2::ExifData& exifData = image->exifData();
