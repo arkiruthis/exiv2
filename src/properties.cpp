@@ -73,6 +73,7 @@ namespace Exiv2 {
 
     //! @cond IGNORE
     extern const XmpPropertyInfo xmpDcInfo[];
+    extern const XmpPropertyInfo xmpCCInfo[];
     extern const XmpPropertyInfo xmpDigikamInfo[];
     extern const XmpPropertyInfo xmpKipiInfo[];
     extern const XmpPropertyInfo xmpXmpInfo[];
@@ -111,6 +112,7 @@ namespace Exiv2 {
     extern const XmpNsInfo xmpNsInfo[] = {
         // Schemas   -   NOTE: Schemas which the XMP-SDK doesn't know must be registered in XmpParser::initialize - Todo: Automate this
         { "http://purl.org/dc/elements/1.1/",             "dc",             xmpDcInfo,        N_("Dublin Core schema")                        },
+        { "https://wiki.creativecommons.org/wiki/XMP",    "cc",             xmpCCInfo,        N_("Creative Commons schema")                   },
         { "http://www.digikam.org/ns/1.0/",               "digiKam",        xmpDigikamInfo,   N_("digiKam Photo Management schema")           },
         { "http://www.digikam.org/ns/kipi/1.0/",          "kipi",           xmpKipiInfo,      N_("KDE Image Program Interface schema")        },
         { "http://ns.adobe.com/xap/1.0/",                 "xmp",            xmpXmpInfo,       N_("XMP Basic schema")                          },
@@ -191,6 +193,15 @@ namespace Exiv2 {
         { "title",            N_("Title"),            "Lang Alt",        langAlt,      xmpExternal, N_("The title of the document, or the name given to the resource. Typically, it will be "
                                                                                                        "a name by which the resource is formally known.")                                      },
         { "type",             N_("Type"),             "bag open Choice", xmpBag,       xmpExternal, N_("A document type; for example, novel, poem, or working paper.")                         },
+        // End of list marker
+        { 0, 0, 0, invalidTypeId, xmpInternal, 0 }
+    };
+
+    extern const XmpPropertyInfo xmpCCInfo[] = {
+        { "license",          N_("License"),          "URL",             xmpText,      xmpExternal, N_("The license URL; for example, http://creativecommons.org/licenses/by-sa/2.0/")         },
+        { "morePermissions",  N_("MorePermissions"),  "URL",             xmpText,      xmpExternal, N_("A URL where additional permissions (commercial licensing, etc) are available.")        },
+        { "attributionURL",   N_("AttributionURL"),   "URL",             xmpText,      xmpExternal, N_("The URL to use when attributing this work.")                                           },
+        { "attributionName",  N_("AttributionName"),  "Text",            xmpText,      xmpExternal, N_("The creator's preferred name to use when attributing this work.")                      },
         // End of list marker
         { 0, 0, 0, invalidTypeId, xmpInternal, 0 }
     };
